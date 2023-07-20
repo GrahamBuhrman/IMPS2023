@@ -109,35 +109,35 @@ dev.off()
 # get plot data
 plot_data <- 
   poster_data %>%
-  dplyr::mutate(`ITE_MLM` = MLM_estimates$ite_pred,
-                `ITE_X-BART` = XBART_estimates$ite_pred,
-                `ITE_Stan4bart` = StanBART_estimates$ite_pred,
-                `ITE_BCF` = BCF_estimates$ite_pred,
-                `ITE_MBCF` = MBCF_estimates$ite_pred,
-                `ITE_TRUE` = ITE) %>%
+  dplyr::mutate(`X-BART` = XBART_estimates$ite_pred,
+                `Stan4bart` = StanBART_estimates$ite_pred,
+                `BCF` = BCF_estimates$ite_pred,
+                `MBCF` = MBCF_estimates$ite_pred,
+                `Oracle` = ITE) %>%
   dplyr::select(-ITE) %>%
-  tidyr::pivot_longer(cols = c(`ITE_MLM`:`ITE_TRUE`),
-                      names_to = c("Method"),
-                      names_prefix = "ITE_",
-                      values_to = "ITE") %>%
-  dplyr::select(IDSTU, IDSCH, LIKEMATH, Method, ITE) %>%
-  dplyr::filter(Method != "TRUE") %>%
-  dplyr::filter(Method != "MLM")
+  dplyr::select(LIKEMATH, `X-BART`, `Stan4bart`, `BCF`, `MBCF`)
 
 # define plot function
 ite_plot <- function(dat) {
   
   ggplot(data = dat,
-         aes(x = LIKEMATH,
-             y = ITE)) +
+         aes(x = LIKEMATH)) +
     ylim(0, 2.5) +
     xlim(5, 15) +
-    geom_smooth(aes(color = Method), method = "gam", se = FALSE) +
-    stat_function(fun = fun1, n = 5001, linewidth = 1.5, color = "black", linetype = "dashed") +
-    stat_function(fun = fun2, n = 5001, linewidth = 1.5, color = "black", linetype = "dashed") +
-    stat_function(fun = fun3, n = 5001, linewidth = 1.5, color = "black", linetype = "dashed") +
-    scale_color_manual(values = c("#f7941e", "#97b85f", "#c5050c","#0479a8")) +
+    geom_smooth(aes(y = `BCF`, linetype = "BCF", color = "BCF"), method = "gam", se = FALSE) +
+    geom_smooth(aes(y = `MBCF`, linetype = "MBCF", color = "MBCF"), method = "gam", se = FALSE) +
+    geom_smooth(aes(y = `Stan4bart`, linetype = "Stan4bart", color = "Stan4bart"), method = "gam", se = FALSE) +
+    geom_smooth(aes(y = `X-BART`, linetype = "X-BART", color = "X-BART"), method = "gam", se = FALSE) +
+    stat_function(fun = fun1, n = 5001, linewidth = 1.5, aes(linetype = "Oracle", color = "Oracle")) +
+    stat_function(fun = fun2, n = 5001, linewidth = 1.5, aes(linetype = "Oracle", color = "Oracle")) +
+    stat_function(fun = fun3, n = 5001, linewidth = 1.5, aes(linetype = "Oracle", color = "Oracle")) +
     theme_minimal() +
+    scale_color_manual(name = "Method", 
+                       breaks = c("BCF", "MBCF", "Stan4bart", "X-BART", "Oracle"), 
+                       values = c("BCF" = "#f7941e", "MBCF" = "#97b85f", "Stan4bart" = "#c5050c", "X-BART" = "#0479a8", "Oracle" = "black")) +
+    scale_linetype_manual(name = "Method", 
+                       breaks = c("BCF", "MBCF", "Stan4bart", "X-BART", "Oracle"), 
+                       values = c("BCF" = "solid", "MBCF" = "solid", "Stan4bart" = "solid", "X-BART" = "solid", "Oracle" = "dashed")) +
     theme(axis.text = element_text(size = 30, family = "Red Hat Display", color = "black"),
           axis.title = element_text(size = 36, family = "Red Hat Display"),
           axis.title.x = element_text(vjust = -0.5, family = "Red Hat Display"),
