@@ -93,7 +93,7 @@ tau_function_plot <- function(dat) {
 }
 
 # generate treatment model plot
-png(filename="tau_functional_form.png", 
+png(filename="Images/Treatment_Curve.png", 
     type="cairo",
     units="in", 
     width=14, 
@@ -121,7 +121,8 @@ plot_data <-
                       names_prefix = "ITE_",
                       values_to = "ITE") %>%
   dplyr::select(IDSTU, IDSCH, LIKEMATH, Method, ITE) %>%
-  dplyr::filter(Method != "TRUE")
+  dplyr::filter(Method != "TRUE") %>%
+  dplyr::filter(Method != "MLM")
 
 # define plot function
 ite_plot <- function(dat) {
@@ -149,7 +150,7 @@ ite_plot <- function(dat) {
 }
 
 # generate treatment model plot
-png(filename="ite_plot.png", 
+png(filename="Images/ITE_plot.png", 
     type="cairo",
     units="in", 
     width=20, 
@@ -166,7 +167,7 @@ likemath_hist <- function(dat) {
   
   ggplot(data = dat,
          aes(x = LIKEMATH)) +
-    geom_histogram(aes(y = stat(density)),
+    geom_histogram(aes(y = after_stat(density)),
                    fill = "#dadfe1",
                    color = "black",
                    binwidth = 1) +
@@ -184,11 +185,11 @@ likemath_hist <- function(dat) {
 }
 
 # generate treatment model plot
-png(filename="likemath_hist.png", 
+png(filename="Images/LIKEMATH_hist.png", 
     type="cairo",
     units="in", 
     width=10, 
-    height=5.75, 
+    height=6, 
     pointsize=12, 
     res=300)
 likemath_hist(plot_data)
